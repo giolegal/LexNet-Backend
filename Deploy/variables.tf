@@ -1,8 +1,10 @@
 variable "client_id" {}
 variable "client_secret" {}
 
+// Number of agents used in primary node pool in our k8s.
+// Right now it is not for production, so less nodes -> cheaper solution.
 variable "agent_count" {
-    default = 3
+    default = 1
 }
 
 variable "ssh_public_key" {
@@ -18,7 +20,7 @@ variable cluster_name {
 }
 
 variable resource_group_name {
-    default = "azure-k8stest"
+    default = "lexnet"
 }
 
 variable location {

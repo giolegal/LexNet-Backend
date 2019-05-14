@@ -12,3 +12,10 @@ terraform {
         key            = "codelab.microsoft.tfstate"
     }
 }
+
+// Resource group to contain all resources created by the project.
+// In created resources - simply reuse the group name as resources's group name.
+resource "azurerm_resource_group" "default" {
+    name     = "${terraform.workspace}-${var.resource_group_name}"
+    location = "${var.location}"
+}

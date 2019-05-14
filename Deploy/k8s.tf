@@ -1,19 +1,14 @@
-resource "azurerm_resource_group" "k8s" {
-    name     = "${var.resource_group_name}"
-    location = "${var.location}"
-}
-
 resource "azurerm_log_analytics_workspace" "test" {
     name                = "${var.log_analytics_workspace_name}"
     location            = "${var.log_analytics_workspace_location}"
-    resource_group_name = "${azurerm_resource_group.k8s.name}"
+    resource_group_name = "${azurerm_resource_group.default.name}"
     sku                 = "${var.log_analytics_workspace_sku}"
 }
 
 resource "azurerm_log_analytics_solution" "test" {
     solution_name         = "ContainerInsights"
     location              = "${azurerm_log_analytics_workspace.test.location}"
-    resource_group_name   = "${azurerm_resource_group.k8s.name}"
+    resource_group_name   = "${azurerm_resource_group.default.name}"
     workspace_resource_id = "${azurerm_log_analytics_workspace.test.id}"
     workspace_name        = "${azurerm_log_analytics_workspace.test.name}"
 
@@ -25,8 +20,8 @@ resource "azurerm_log_analytics_solution" "test" {
 
 resource "azurerm_kubernetes_cluster" "k8s" {
     name                = "${var.cluster_name}"
-    location            = "${azurerm_resource_group.k8s.location}"
-    resource_group_name = "${azurerm_resource_group.k8s.name}"
+    location            = "${azurerm_resource_group.default.location}"
+    resource_group_name = "${azurerm_resource_group.default.name}"
     dns_prefix          = "${var.dns_prefix}"
 
     linux_profile {
@@ -40,7 +35,8 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     agent_pool_profile {
         name            = "agentpool"
         count           = "${var.agent_count}"
-        vm_size         = "Standard_DS1_v2"
+        // Standard_B2s: VCPUS:2, RAM(GB):4. The smallest available VM for Kubernetes
+        vm_size         = "Standard_B2s"
         os_type         = "Linux"
         os_disk_size_gb = 30
     }
